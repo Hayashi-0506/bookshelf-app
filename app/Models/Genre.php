@@ -11,7 +11,7 @@ class Genre extends Model
     use HasFactory;
 
     /**
-     * ジャンルに紐づく本を取得します。
+     * ジャンルに紐づく書籍を取得します。
      */
     public function books(): BelongsToMany
     {

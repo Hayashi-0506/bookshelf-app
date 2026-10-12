@@ -36,9 +36,11 @@ class BookController extends Controller
     /**
      * 指定された書籍を表示します。
      */
-    public function show(string $id)
+    public function show(Book $book)
     {
-        //
+        $book->load(['reviews']);
+
+        return view('books.show', compact('book'));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -45,10 +46,26 @@ class User extends Authenticatable
     ];
 
     /**
-     * ユーザーが登録した本を取得します。
+     * ユーザーが登録した書籍を取得します。
      */
     public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class);
+    }
+
+    /**
+     * ユーザーが登録したレビューを取得します。
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * お気に入りの書籍を取得します。
+     */
+    public function favoriteBooks(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class, 'favorites')->withTimestamps();
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('author', 255);
             $table->string('isbn', 13)->unique();
             $table->date('published_date');
-            $table->string('description', 255);
+            $table->text('description');
             $table->string('image_url', 255);
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
