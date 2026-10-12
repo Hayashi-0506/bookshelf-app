@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * ユーザーのシーダーを実行します。
      */
     public function run(): void
     {
-        // 一般ユーザーを作成
+        // ユーザーを作成
         User::firstOrCreate(
             ['email' => 'yamada@example.com'],
             ['name' => '山田太郎', 'password' => Hash::make('password')]
