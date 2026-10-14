@@ -13,6 +13,20 @@ class Book extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'author',
+        'isbn',
+        'published_date',
+        'description',
+        'image_url',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'published_date' => 'date',
+    ];
+
     /**
      * 書籍に紐づくジャンルを取得します。
      */
