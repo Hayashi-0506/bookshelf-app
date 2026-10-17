@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use Illuminate\Http\RedirectResponse;
 
 class FavoriteController extends Controller
 {
     /**
      * お気に入りの登録または削除を行います。
      */
-    public function toggle(Book $book)
+    public function toggle(Book $book): RedirectResponse
     {
-        $book->loadExists([
-            'favoriteUsers as is_favorited' => fn ($query) => $query->where('user_id', auth()->id()),
-        ]);
-
         $result = $book->favoriteUsers()->toggle(auth()->id());
 
         $message = empty($result['attached'])

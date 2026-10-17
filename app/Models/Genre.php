@@ -11,10 +11,15 @@ class Genre extends Model
     use HasFactory;
 
     /**
+     * 複数代入（一括割り当て）を許可する属性。
+     */
+    protected $fillable = ['name'];
+
+    /**
      * ジャンルに紐づく書籍を取得します。
      */
     public function books(): BelongsToMany
     {
-        return $this->belongsToMany(Book::class);
+        return $this->belongsToMany(Book::class)->withTimestamps();
     }
 }

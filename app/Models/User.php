@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * 複数代入（一括割り当て）を許可する属性。
      *
      * @var array<int, string>
      */
@@ -26,7 +27,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * シリアライズ（JSON変換など）時に非表示にする属性。
      *
      * @var array<int, string>
      */
@@ -36,7 +37,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * 型キャスト（データのデータ型変換）を適用する属性。
      *
      * @var array<string, string>
      */
@@ -48,9 +49,9 @@ class User extends Authenticatable
     /**
      * ユーザーが登録した書籍を取得します。
      */
-    public function books(): BelongsToMany
+    public function books(): HasMany
     {
-        return $this->belongsToMany(Book::class);
+        return $this->hasMany(Book::class);
     }
 
     /**
@@ -67,5 +68,13 @@ class User extends Authenticatable
     public function favoriteBooks(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'favorites')->withTimestamps();
+    }
+
+    /**
+     * ユーザーがいいねを押したレビューを取得します。
+     */
+    public function likedReviews(): BelongsToMany
+    {
+        return $this->belongsToMany(Review::class, 'review_likes')->withTimestamps();
     }
 }

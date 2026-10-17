@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +12,9 @@ class Book extends Model
 {
     use HasFactory;
 
+    /**
+     * 複数代入（一括割り当て）を許可する属性。
+     */
     protected $fillable = [
         'title',
         'author',
@@ -20,11 +22,7 @@ class Book extends Model
         'published_date',
         'description',
         'image_url',
-        'created_by',
-    ];
-
-    protected $casts = [
-        'published_date' => 'date',
+        'user_id',
     ];
 
     /**
@@ -32,7 +30,7 @@ class Book extends Model
      */
     public function genres(): BelongsToMany
     {
-        return $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(Genre::class)->withTimestamps();
     }
 
     /**
@@ -49,14 +47,6 @@ class Book extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
-    }
-
-    /**
-     * レビュー評価の平均値を取得します。
-     */
-    protected function reviewsAvgRating(): Attribute
-    {
-        return Attribute::make(get: fn () => 1);
     }
 
     /**

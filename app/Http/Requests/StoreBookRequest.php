@@ -26,9 +26,9 @@ class StoreBookRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
             'isbn' => ['required', 'string', 'digits:13', 'unique:books,isbn'],
-            'published_date' => ['required', 'string', 'date_format:Y-m-d'],
+            'published_date' => ['required', 'date_format:Y-m-d'],
             'description' => ['nullable', 'string'],
-            'image_url' => ['nullable', 'string', 'url', 'max:255'],
+            'image_url' => ['nullable', 'url', 'max:255'],
             'genres' => ['required', 'array'],
             'genres.*' => ['integer', 'exists:genres,id'],
         ];
@@ -51,7 +51,7 @@ class StoreBookRequest extends FormRequest
             'published_date.date_format' => '出版日は「YYYY-MM-DD」の形式で入力してください。',
             'image_url.url' => '画像URLは正しいURLの形式で入力してください。',
             'image_url.max' => '画像URLは255文字以内で入力してください。',
-            'genres.required' => 'ジャンルを選択してください。',
+            'genres.required' => 'ジャンルを1つ以上選択してください。',
             'genres.*.exists' => '選択されたジャンルが存在しません。',
         ];
     }
