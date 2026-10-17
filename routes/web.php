@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('books', BookController::class)->except('index', 'show');
+    Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('favorites/{book}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('reviews/{review}/like', [ReviewLikeController::class, 'toggle'])->name('reviews.like');
@@ -22,5 +23,4 @@ Route::resource('books', BookController::class)->only('index', 'show');
 
 // 仮ルート
 Route::get('/ranking', fn () => 'ランキング（準備中）')->name('ranking.index');
-Route::get('/favorites', fn () => 'お気に入り（準備中）')->name('favorites.index');
 Route::get('/genres', fn () => 'ジャンル管理（準備中）')->name('genres.index');
