@@ -25,7 +25,7 @@ class BookSeeder extends Seeder
                     ...Arr::except($data, 'genres'),
                     'description' => fake()->realText(100),
                     'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text='.($index + 1),
-                    'created_by' => $user->id,
+                    'user_id' => $user->id,
                 ],
             );
 
