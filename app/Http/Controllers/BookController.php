@@ -33,7 +33,7 @@ class BookController extends Controller
     }
 
     /**
-     * 新しく作成した書籍を登録します。
+     * 新規の書籍を登録します。
      */
     public function store(StoreBookRequest $request): RedirectResponse
     {
