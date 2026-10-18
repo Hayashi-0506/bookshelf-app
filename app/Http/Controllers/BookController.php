@@ -56,7 +56,10 @@ class BookController extends Controller
      */
     public function show(Book $book): View
     {
-        $book->loadAvg('reviews', 'rating');
+        $book->load([
+            'genres',
+            'reviews' => fn ($query) => $query->with('user')->withCount('likedByUsers')->latest(),
+        ]);
 
         return view('books.show', compact('book'));
     }
