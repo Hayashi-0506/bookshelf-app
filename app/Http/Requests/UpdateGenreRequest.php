@@ -2,6 +2,4 @@
 
 namespace App\Http\Requests;
 
-class UpdateGenreRequest extends StoreGenreRequest
-{
-}
+class UpdateGenreRequest extends StoreGenreRequest {}
