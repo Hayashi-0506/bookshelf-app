@@ -24,7 +24,7 @@ class StoreReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => ['required', 'integer', 'in:1,2,3,4,5'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'comment' => ['nullable', 'string'],
             'book' => [
                 Rule::unique('reviews', 'book_id')->where('user_id', $this->user()->id),

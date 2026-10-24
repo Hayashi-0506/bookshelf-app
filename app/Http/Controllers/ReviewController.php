@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class ReviewController extends Controller
 {
     /**
-     * 新規のレビューを登録します。
+     * レビューを新規登録します。
      */
     public function store(StoreReviewRequest $request, Book $book): RedirectResponse
     {
