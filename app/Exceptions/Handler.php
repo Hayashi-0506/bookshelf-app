@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -25,6 +28,18 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null; // web側はLaravelの標準挙動（404ページ）のまま
+            }
+
+            if ($e->getPrevious() instanceof ModelNotFoundException) {
+                return response()->json([
+                    'error' => '書籍情報が見つかりませんでした。',
+                ], 404);
+            }
         });
     }
 }

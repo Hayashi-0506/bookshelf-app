@@ -17,7 +17,7 @@ class BookController extends Controller
      */
     public function index(): View
     {
-        $books = Book::withAvg('reviews', 'rating')->latest()->paginate(10);
+        $books = Book::withAvg('reviews', 'rating')->orderBy('id')->paginate(10);
 
         return view('books.index', compact('books'));
     }
@@ -33,7 +33,7 @@ class BookController extends Controller
     }
 
     /**
-     * 新規の書籍を登録します。
+     * 書籍を新規登録します。
      */
     public function store(StoreBookRequest $request): RedirectResponse
     {
@@ -81,6 +81,8 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book): RedirectResponse
     {
+        $this->authorize('update', $book);
+
         $book = DB::transaction(function () use ($request, $book) {
             $book->update([
                 $request->safe()->except('genres'),

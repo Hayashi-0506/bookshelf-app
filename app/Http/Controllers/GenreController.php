@@ -31,7 +31,7 @@ class GenreController extends Controller
     }
 
     /**
-     * 新規のジャンルを登録します。
+     * ジャンルを新規登録します。
      */
     public function store(StoreGenreRequest $request): RedirectResponse
     {
