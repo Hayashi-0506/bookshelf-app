@@ -24,3 +24,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('books', BookController::class)->only('index', 'show');
 Route::get('ranking', [RankingController::class, 'index'])->name('ranking.index');
+Route::get('/reports', fn () => 'レポート（準備中）')->name('reports.index');
+Route::get('/reading-plans', fn () => '通知一覧（準備中）')->name('reading-plans.index');
+Route::get('/notifications', fn () => 'ベル（準備中）')->name('notifications.index');
