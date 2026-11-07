@@ -4,7 +4,9 @@ namespace App\Exceptions;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -40,6 +42,17 @@ class Handler extends ExceptionHandler
                     'error' => '書籍情報が見つかりませんでした。',
                 ], 404);
             }
+        });
+
+        $this->renderable(function (AccessDeniedHttpException $e, Request $request): ?JsonResponse {
+            if ($request->is('api/*')) {
+                return response()->json(
+                    ['error' => 'この操作を実行する権限がありません。'],
+                    JsonResponse::HTTP_FORBIDDEN
+                );
+            }
+
+            return null;
         });
     }
 }
