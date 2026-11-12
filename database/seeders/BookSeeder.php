@@ -15,17 +15,17 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrFail();
+        $users = User::all();
         $genreIds = Genre::pluck('id', 'name');
 
-        collect($this->books())->each(function (array $data, int $index) use ($user, $genreIds) {
+        collect($this->books())->each(function (array $data, int $index) use ($users, $genreIds) {
             $book = Book::firstOrCreate(
                 ['isbn' => $data['isbn']],
                 [
                     ...Arr::except($data, 'genres'),
                     'description' => fake()->realText(100),
                     'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text='.($index + 1),
-                    'user_id' => $user->id,
+                    'user_id' => $users->random()->id,
                 ],
             );
 

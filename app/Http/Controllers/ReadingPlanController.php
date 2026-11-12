@@ -54,13 +54,13 @@ class ReadingPlanController extends Controller
      */
     public function store(StoreReadingPlanRequest $request): RedirectResponse
     {
-        $readingPlan = $request->user()->readingPlans()->create([
+        $request->user()->readingPlans()->create([
             ...$request->validated(),
             'status' => ReadingPlanStatus::InProgress,
         ]);
 
         return redirect()->route('reading-plans.index')
-            ->with('success', "「{$readingPlan->book->title}」の読書計画を作成しました。");
+            ->with('success', '読書計画を登録しました。');
     }
 
     /**
@@ -86,7 +86,7 @@ class ReadingPlanController extends Controller
         ]);
 
         return redirect()->route('reading-plans.index')
-            ->with('success', "「{$readingPlan->book->title}」の読書計画を更新しました。");
+            ->with('success', '読書計画を更新しました。');
     }
 
     /**
@@ -96,11 +96,10 @@ class ReadingPlanController extends Controller
     {
         $this->authorize('delete', $readingPlan);
 
-        $title = $readingPlan->book->title;
         $readingPlan->delete();
 
         return redirect()->route('reading-plans.index')
-            ->with('success', "「{$title}」の読書計画を削除しました。");
+            ->with('success', '読書計画を削除しました。');
     }
 
     /**
@@ -116,6 +115,6 @@ class ReadingPlanController extends Controller
         ]);
 
         return redirect()->route('reading-plans.index')
-            ->with('success', "「{$readingPlan->book->title}」を読了しました。");
+            ->with('success', '読書計画を完了しました。');
     }
 }
