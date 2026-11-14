@@ -7,6 +7,10 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Services\GoogleBooksService;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -134,5 +138,23 @@ class BookController extends Controller
 
         return redirect()->route('books.index')
             ->with('success', '書籍を削除しました。');
+    }
+
+    /**
+     * ISBN で Google Books API から書籍情報を検索します。
+     */
+    public function searchByIsbn(string $isbn, GoogleBooksService $googleBooks): JsonResponse
+    {
+        try {
+            $book = $googleBooks->findByIsbn($isbn);
+        } catch (RequestException|ConnectionException) {
+            return response()->json(['error' => '書籍情報の取得に失敗しました。時間をおいて再度お試しください。'], 503);
+        }
+
+        if ($book === null) {
+            return response()->json(['error' => '該当する書籍が見つかりませんでした。'], 404);
+        }
+
+        return response()->json($book);
     }
 }
