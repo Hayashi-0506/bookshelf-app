@@ -16,6 +16,9 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('books/isbn/{isbn}', [BookController::class, 'searchByIsbn'])
+        ->where('isbn', '[0-9]{13}')
+        ->name('books.isbn');
     Route::resource('books', BookController::class)->except('index', 'show');
     Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('favorites/{book}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
