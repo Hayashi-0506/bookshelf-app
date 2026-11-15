@@ -68,6 +68,8 @@ class ReadingPlanController extends Controller
      */
     public function edit(ReadingPlan $readingPlan): View
     {
+        $this->authorize('update', $readingPlan);
+
         $readingPlan->load('book');
 
         return view('reading-plans.edit', compact('readingPlan'));

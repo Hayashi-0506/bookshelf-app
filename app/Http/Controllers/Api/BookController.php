@@ -74,9 +74,7 @@ class BookController extends Controller
         $this->authorize('update', $book);
 
         $book = DB::transaction(function () use ($request, $book) {
-            $book->update([
-                $request->safe()->except('genres'),
-            ]);
+            $book->update($request->safe()->except('genres'));
             $book->genres()->sync($request->validated('genres'));
 
             return $book;

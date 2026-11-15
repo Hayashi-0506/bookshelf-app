@@ -21,7 +21,7 @@ class BookResource extends JsonResource
             'isbn' => $this->isbn,
             'published_date' => $this->published_date,
             'description' => $this->when(
-                $request->routeIs('books.show'),
+                $request->routeIs('api.books.show'),
                 $this->description,
             ),
             'image_url' => $this->image_url,
