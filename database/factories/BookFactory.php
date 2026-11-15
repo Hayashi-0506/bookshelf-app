@@ -19,7 +19,7 @@ class BookFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => rtrim(fake()->realText(20), '。、'),
+            'title' => preg_replace('/[。、]+$/u', '', fake()->realText(20)),
             'author' => fake()->name(),
             'isbn' => fake()->unique()->isbn13(),
             'published_date' => fake()->dateTimeBetween('-30 years', 'now')->format('Y-m-d'),
