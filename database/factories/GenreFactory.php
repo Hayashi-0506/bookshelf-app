@@ -18,7 +18,7 @@ class GenreFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => rtrim(fake()->realText(10), '。、'),
+            'name' => 'ジャンル'.fake()->unique()->numberBetween(1, 99999),
         ];
     }
 }
