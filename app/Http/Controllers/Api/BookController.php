@@ -23,18 +23,10 @@ class BookController extends Controller
         $genreId = $request->input('genre_id');
         $perPage = $request->integer('per_page', 20);
 
-        $books = Book::with(['genres'])
+        $books = Book::search($keyword, $genreId)
+            ->with(['genres'])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
-            ->when($keyword, function ($query, $keyword) {
-                $query->where(function ($q) use ($keyword) {
-                    $q->where('title', 'like', "%{$keyword}%")
-                        ->orWhere('author', 'like', "%{$keyword}%");
-                });
-            })
-            ->when($genreId, function ($query, $genreId) {
-                $query->whereHas('genres', fn ($q) => $q->where('genres.id', $genreId));
-            })
             ->orderBy('id')
             ->paginate($perPage);
 

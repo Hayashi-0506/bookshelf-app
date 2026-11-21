@@ -47,7 +47,7 @@ class StoreReadingPlanRequest extends FormRequest
     {
         return [
             'book_id.required' => '書籍を選択してください。',
-            'book_id.max' => '選択された書籍が存在しません。',
+            'book_id.exists' => '選択された書籍が存在しません。',
             'book_id.unique' => 'この書籍にはすでに未読了の読書計画があります。期日を延ばす場合は、既存の計画を編集してください。',
             'target_date.required' => '期日を入力してください。',
             'target_date.date_format' => '期日は「YYYY-MM-DD」の形式で入力してください。',

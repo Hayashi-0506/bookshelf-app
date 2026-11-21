@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 
 class Book extends Model
 {
@@ -64,5 +65,17 @@ class Book extends Model
     public function favoriteUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
+
+    /**
+     * 検索・並び替えのSQLを取得します。
+     */
+    public function scopeSearch(Builder $query, ?string $keyword, ?int $genreId): Builder
+    {
+        return $query
+            ->when($keyword, fn (Builder $q) => $q->where(fn (Builder $q) => $q
+                ->where('title', 'like', "%{$keyword}%")
+                ->orWhere('author', 'like', "%{$keyword}%")))
+            ->when($genreId, fn (Builder $q) => $q->whereHas('genres', fn (Builder $q) => $q->where('genres.id', $genreId)));
     }
 }

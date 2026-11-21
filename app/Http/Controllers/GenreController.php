@@ -47,6 +47,7 @@ class GenreController extends Controller
     public function show(Genre $genre): View
     {
         $books = $genre->books()
+            ->with('genres')
             ->orderBy('books.id')
             ->paginate(10);
 

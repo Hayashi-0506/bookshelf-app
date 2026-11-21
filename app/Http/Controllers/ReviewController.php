@@ -41,6 +41,8 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, Review $review): RedirectResponse
     {
+        $this->authorize('update', $review);
+
         $review->update($request->validated());
 
         return redirect()->route('books.show', $review->book_id)

@@ -26,10 +26,6 @@ class ReadingPlanController extends Controller
         $readingPlans = $user->readingPlans()
             ->with('book')
             ->when($currentStatus, fn ($query, $status) => $query->whereStatus(ReadingPlanStatus::from($status)))
-            ->orderByRaw(
-                'CASE WHEN status = ? THEN 3 WHEN target_date < ? THEN 2 ELSE 1 END',
-                [ReadingPlanStatus::Completed->value, today()->toDateString()],
-            )
             ->orderBy('status')
             ->orderByDesc('completed_at')
             ->orderBy('target_date')
