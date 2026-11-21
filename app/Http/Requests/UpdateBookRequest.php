@@ -12,7 +12,7 @@ class UpdateBookRequest extends StoreBookRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->id === $this->route('book')->user_id;
+        return true;
     }
 
     /**

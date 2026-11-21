@@ -12,7 +12,7 @@ class UpdateReviewRequest extends StoreReviewRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->id === $this->route('review')->user_id;
+        return true;
     }
 
     /**

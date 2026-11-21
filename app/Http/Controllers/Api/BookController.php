@@ -20,7 +20,7 @@ class BookController extends Controller
     public function index(IndexBookRequest $request): BookCollection
     {
         $keyword = $request->input('keyword');
-        $genreId = $request->input('genre_id');
+        $genreId = $request->integer('genre_id');
         $perPage = $request->integer('per_page', 20);
 
         $books = Book::search($keyword, $genreId)
