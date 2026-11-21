@@ -24,6 +24,14 @@ class Handler extends ExceptionHandler
     ];
 
     /**
+     * API へのリクエストは、Accept ヘッダーがなくても例外を JSON で返します。
+     */
+    protected function shouldReturnJson($request, Throwable $e): bool
+    {
+        return $request->is('api/*') || parent::shouldReturnJson($request, $e);
+    }
+
+    /**
      * Register the exception handling callbacks for the application.
      */
     public function register(): void

@@ -49,8 +49,8 @@ class ReminderBatchTest extends TestCase
         Notification::assertSentTo(
             $this->user,
             PlanReminderNotification::class,
-            fn (PlanReminderNotification $notification) => $notification->toArray($this->user)['reading_plan_id'] === $plan->id
-                && $notification->toArray($this->user)['type'] === $type->value,
+            fn (PlanReminderNotification $notification) => $notification->toArray($this->user)['plan_id'] === $plan->id
+                && $notification->toArray($this->user)['timing'] === $type->value,
         );
     }
 
@@ -131,7 +131,7 @@ class ReminderBatchTest extends TestCase
     }
 
     /**
-     * 通知はデータベースにタイトルと書籍名を含む本文を保存する。
+     * 通知はデータベースに計画ID・書籍名・タイミング・タイトル・本文を保存する。
      */
     public function test_notification_stores_title_and_body_with_book_title(): void
     {
@@ -146,9 +146,9 @@ class ReminderBatchTest extends TestCase
         $this->assertSame(PlanReminderNotification::class, $notification->type);
         $this->assertNull($notification->read_at);
         $this->assertSame([
-            'reading_plan_id' => $plan->id,
-            'book_id' => $plan->book_id,
-            'type' => 'upcoming',
+            'plan_id' => $plan->id,
+            'book_title' => 'リーダブルコード',
+            'timing' => 'three_days_before',
             'title' => '読書期日が近づいています',
             'body' => '「リーダブルコード」の読書期日まであと3日です。',
         ], $notification->data);
@@ -179,7 +179,7 @@ class ReminderBatchTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('notifications.index'))
             ->assertOk()
-            ->assertSee('今日が読書期日です')
+            ->assertSee('本日が読書期日です')
             ->assertSee('「リーダブルコード」の読書期日になりました。');
 
         $this->actingAs($this->user)

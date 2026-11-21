@@ -9,7 +9,7 @@ use App\Models\User;
 class ReadingPlanPolicy
 {
     /**
-     * ユーザーが書籍管理を編集できるか判断します。
+     * ユーザーが読書計画を編集できるか判断します。
      */
     public function update(User $user, ReadingPlan $readingPlan): bool
     {
@@ -17,7 +17,7 @@ class ReadingPlanPolicy
     }
 
     /**
-     * ユーザーが書籍管理を削除できるか判断します。
+     * ユーザーが読書計画を削除できるか判断します。
      */
     public function delete(User $user, ReadingPlan $readingPlan): bool
     {
@@ -25,7 +25,7 @@ class ReadingPlanPolicy
     }
 
     /**
-     * ユーザーが書籍管理を読了にするか判断します。
+     * ユーザーが読書計画を読了にするか判断します。
      */
     public function complete(User $user, ReadingPlan $readingPlan): bool
     {

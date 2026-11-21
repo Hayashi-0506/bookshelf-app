@@ -123,7 +123,7 @@ class AutoExpireBatchTest extends TestCase
         Notification::assertSentTo(
             $this->user,
             PlanReminderNotification::class,
-            fn (PlanReminderNotification $notification) => $notification->toArray($this->user)['type'] === PlanReminderType::ReEngagement->value,
+            fn (PlanReminderNotification $notification) => $notification->toArray($this->user)['timing'] === PlanReminderType::ReEngagement->value,
         );
     }
 

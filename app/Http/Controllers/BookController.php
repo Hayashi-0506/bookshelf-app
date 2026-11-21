@@ -23,9 +23,9 @@ class BookController extends Controller
      */
     public function index(IndexBookRequest $request): View
     {
-        $keyword = $request?->input('keyword');
-        $genreId = $request?->integer('genre');
-        $sort = $request?->input('sort');
+        $keyword = $request->input('keyword');
+        $genreId = $request->integer('genre');
+        $sort = $request->input('sort');
 
         $books = Book::search($keyword, $genreId)
             ->with(['genres'])

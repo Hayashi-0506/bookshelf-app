@@ -126,6 +126,33 @@ class ReviewTest extends TestCase
     }
 
     /**
+     * レビュー投稿枠は未レビューなら表示され、自分がレビュー済みなら表示されない。
+     */
+    public function test_review_form_is_hidden_after_user_reviewed(): void
+    {
+        $formAction = route('reviews.store', $this->book);
+
+        // 他のユーザーだけがレビューしている場合は表示される
+        Review::factory()->for($this->book)->create();
+
+        $this->actingAs($this->user)
+            ->get(route('books.show', $this->book))
+            ->assertOk()
+            ->assertSee('レビューを投稿')
+            ->assertSee($formAction);
+
+        // 自分がレビューすると表示されなくなる
+        Review::factory()->for($this->user)->for($this->book)->create(['comment' => '自分のレビューです。']);
+
+        $this->actingAs($this->user)
+            ->get(route('books.show', $this->book))
+            ->assertOk()
+            ->assertSee('自分のレビューです。')
+            ->assertDontSee('レビューを投稿')
+            ->assertDontSee($formAction);
+    }
+
+    /**
      * 他のユーザーがレビュー済みの書籍にもレビューを投稿できる。
      */
     public function test_can_review_book_reviewed_by_others(): void

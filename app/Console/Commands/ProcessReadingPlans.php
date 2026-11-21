@@ -48,8 +48,13 @@ class ProcessReadingPlans extends Command
             ->whereDate('target_date', $targetDate)
             ->lazyById();
 
-        $plans->each(fn (ReadingPlan $plan) => $plan->user->notify(new PlanReminderNotification($plan, $type)));
+        $count = 0;
 
-        $this->info("{$type->value}: {$plans->count()}件");
+        $plans->each(function (ReadingPlan $plan) use ($type, &$count) {
+            $plan->user->notify(new PlanReminderNotification($plan, $type));
+            $count++;
+        });
+
+        $this->info("{$type->value}: {$count}件");
     }
 }

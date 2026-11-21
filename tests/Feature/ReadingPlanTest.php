@@ -218,6 +218,38 @@ class ReadingPlanTest extends TestCase
     }
 
     /**
+     * 読了済みの計画は編集・更新・再読了できないが、削除はできる。
+     */
+    public function test_completed_plan_cannot_be_edited_updated_or_completed_again(): void
+    {
+        $completedAt = now()->subDays(2)->startOfSecond();
+        $plan = ReadingPlan::factory()->for($this->user)->for($this->book)->create([
+            'status' => ReadingPlanStatus::Completed,
+            'target_date' => today()->subDays(3),
+            'completed_at' => $completedAt,
+        ]);
+        // 同じ書籍で進行中の計画がある場合も、読了済みの計画を戻して重複させられない
+        ReadingPlan::factory()->for($this->user)->for($this->book)->create();
+
+        $this->actingAs($this->user)->get(route('reading-plans.edit', $plan))->assertForbidden();
+        $this->actingAs($this->user)
+            ->put(route('reading-plans.update', $plan), ['target_date' => today()->addWeek()->format('Y-m-d')])
+            ->assertForbidden();
+        $this->actingAs($this->user)->post(route('reading-plans.complete', $plan))->assertForbidden();
+
+        $plan->refresh();
+        $this->assertSame(ReadingPlanStatus::Completed, $plan->status);
+        $this->assertTrue($plan->target_date->isSameDay(today()->subDays(3)));
+        $this->assertTrue($plan->completed_at->equalTo($completedAt));
+        $this->assertSame(1, $this->user->readingPlans()->where('status', '!=', ReadingPlanStatus::Completed)->count());
+
+        $this->actingAs($this->user)
+            ->delete(route('reading-plans.destroy', $plan))
+            ->assertRedirect(route('reading-plans.index'));
+        $this->assertModelMissing($plan);
+    }
+
+    /**
      * 自分の読書計画を削除できる。
      */
     public function test_owner_can_delete_plan(): void

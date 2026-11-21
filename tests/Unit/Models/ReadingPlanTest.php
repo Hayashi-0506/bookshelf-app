@@ -95,7 +95,7 @@ class ReadingPlanTest extends TestCase
     public function test_reminder_type_enum_returns_title_and_body_with_book_title(): void
     {
         $this->assertSame('読書期日が近づいています', PlanReminderType::Upcoming->title());
-        $this->assertSame('今日が読書期日です', PlanReminderType::DueToday->title());
+        $this->assertSame('本日が読書期日です', PlanReminderType::DueToday->title());
         $this->assertSame('読書計画を再開しませんか？', PlanReminderType::ReEngagement->title());
 
         collect(PlanReminderType::cases())->each(
