@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum PlanReminderType: string
 {
-    case Upcoming = 'upcoming';         // 期日3日前
-    case DueToday = 'due_today';        // 期日当日
-    case ReEngagement = 're_engagement'; // 期日3日後
+    case Upcoming = 'three_days_before';         // 期日3日前
+    case DueToday = 'on_due_date';        // 期日当日
+    case ReEngagement = 'three_days_after'; // 期日3日後
 
     /**
      * 通知のタイトルを取得します。
@@ -15,7 +15,7 @@ enum PlanReminderType: string
     {
         return match ($this) {
             self::Upcoming => '読書期日が近づいています',
-            self::DueToday => '今日が読書期日です',
+            self::DueToday => '本日が読書期日です',
             self::ReEngagement => '読書計画を再開しませんか？',
         };
     }

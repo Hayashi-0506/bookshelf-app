@@ -27,9 +27,9 @@ class PlanReminderNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'reading_plan_id' => $this->plan->id,
-            'book_id' => $this->plan->book_id,
-            'type' => $this->type->value,
+            'plan_id' => $this->plan->id,
+            'book_title' => $this->plan->book->title,
+            'timing' => $this->type->value,
             'title' => $this->type->title(),
             'body' => $this->type->body($this->plan->book->title),
         ];
