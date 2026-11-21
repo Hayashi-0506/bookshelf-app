@@ -43,15 +43,50 @@ class ReviewTest extends TestCase
     }
 
     /**
-     * コメントは未入力でも投稿できる。
+     * コメントが未入力の場合は投稿・更新できない。
      */
-    public function test_comment_is_optional(): void
+    public function test_comment_is_required(): void
+    {
+        collect([null, ''])->each(
+            fn (?string $comment) => $this->actingAs($this->user)
+                ->post(route('reviews.store', $this->book), ['rating' => 3, 'comment' => $comment])
+                ->assertSessionHasErrors(['comment' => 'コメントを入力してください。'])
+        );
+
+        $this->assertDatabaseCount('reviews', 0);
+
+        $review = Review::factory()->for($this->user)->create(['comment' => '元のコメント']);
+
+        $this->actingAs($this->user)
+            ->put(route('reviews.update', $review), ['rating' => 3, 'comment' => ''])
+            ->assertSessionHasErrors(['comment' => 'コメントを入力してください。']);
+
+        $this->assertSame('元のコメント', $review->fresh()->comment);
+    }
+
+    /**
+     * コメントは1000文字を超えると投稿・更新できず、1000文字なら投稿できる。
+     */
+    public function test_comment_must_not_exceed_1000_characters(): void
     {
         $this->actingAs($this->user)
-            ->post(route('reviews.store', $this->book), ['rating' => 3])
+            ->post(route('reviews.store', $this->book), ['rating' => 3, 'comment' => str_repeat('あ', 1001)])
+            ->assertSessionHasErrors(['comment' => 'コメントは1000文字以内で入力してください。']);
+
+        $this->assertDatabaseCount('reviews', 0);
+
+        $this->actingAs($this->user)
+            ->post(route('reviews.store', $this->book), ['rating' => 3, 'comment' => str_repeat('あ', 1000)])
             ->assertSessionHasNoErrors();
 
-        $this->assertDatabaseHas('reviews', ['book_id' => $this->book->id, 'comment' => null]);
+        $review = Review::firstOrFail();
+        $this->assertSame(1000, mb_strlen($review->comment));
+
+        $this->actingAs($this->user)
+            ->put(route('reviews.update', $review), ['rating' => 3, 'comment' => str_repeat('い', 1001)])
+            ->assertSessionHasErrors(['comment' => 'コメントは1000文字以内で入力してください。']);
+
+        $this->assertSame(str_repeat('あ', 1000), $review->fresh()->comment);
     }
 
     /**
@@ -69,7 +104,7 @@ class ReviewTest extends TestCase
             $book = Book::factory()->create();
 
             $this->actingAs($this->user)
-                ->post(route('reviews.store', $book), ['rating' => $rating])
+                ->post(route('reviews.store', $book), ['rating' => $rating, 'comment' => '評価のテストです。'])
                 ->assertSessionHasNoErrors();
         });
 
@@ -98,7 +133,7 @@ class ReviewTest extends TestCase
         Review::factory()->for($this->book)->create();
 
         $this->actingAs($this->user)
-            ->post(route('reviews.store', $this->book), ['rating' => 5])
+            ->post(route('reviews.store', $this->book), ['rating' => 5, 'comment' => '素晴らしい本でした！'])
             ->assertSessionHasNoErrors();
 
         $this->assertDatabaseCount('reviews', 2);
@@ -174,7 +209,7 @@ class ReviewTest extends TestCase
         $review = Review::factory()->for($this->book)->create(['rating' => 3]);
 
         $this->actingAs($this->user)->get(route('reviews.edit', $review))->assertForbidden();
-        $this->actingAs($this->user)->put(route('reviews.update', $review), ['rating' => 1])->assertForbidden();
+        $this->actingAs($this->user)->put(route('reviews.update', $review), ['rating' => 1, 'comment' => '書き換えようとしたコメント'])->assertForbidden();
         $this->actingAs($this->user)->delete(route('reviews.destroy', $review))->assertForbidden();
 
         $this->assertSame(3, $review->fresh()->rating);

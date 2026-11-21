@@ -25,7 +25,7 @@ class StoreReviewRequest extends FormRequest
     {
         return [
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string'],
+            'comment' => ['required', 'string', 'max:1000'],
             'book' => [
                 Rule::unique('reviews', 'book_id')->where('user_id', $this->user()->id),
             ],
@@ -39,6 +39,8 @@ class StoreReviewRequest extends FormRequest
     {
         return [
             'book.unique' => 'この書籍にはすでにレビューを投稿しています。',
+            'comment.required' => 'コメントを入力してください。',
+            'comment.max' => 'コメントは1000文字以内で入力してください。',
         ];
     }
 

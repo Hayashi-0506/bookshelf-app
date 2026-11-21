@@ -165,6 +165,30 @@ class BookCrudTest extends TestCase
     }
 
     /**
+     * 画像URLは256文字を超えると登録できず、255文字なら登録できる。
+     */
+    public function test_image_url_must_not_exceed_255_characters(): void
+    {
+        $baseUrl = 'https://example.com/';
+
+        $this->actingAs($this->user)
+            ->post(route('books.store'), $this->validData([
+                'image_url' => $baseUrl.str_repeat('a', 256 - strlen($baseUrl)),
+            ]))
+            ->assertSessionHasErrors(['image_url' => '画像URLは255文字以内で入力してください。']);
+
+        $this->assertDatabaseCount('books', 0);
+
+        $maxLengthUrl = $baseUrl.str_repeat('a', 255 - strlen($baseUrl));
+
+        $this->actingAs($this->user)
+            ->post(route('books.store'), $this->validData(['image_url' => $maxLengthUrl]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('books', ['image_url' => $maxLengthUrl]);
+    }
+
+    /**
      * ISBNが13桁の数字でない場合は登録できない。
      */
     public function test_isbn_must_be_13_digits(): void

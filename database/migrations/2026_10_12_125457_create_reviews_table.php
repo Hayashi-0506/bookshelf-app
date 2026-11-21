@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
-            $table->text('comment')->nullable();
+            $table->string('comment', 1000);
             $table->timestamps();
 
             $table->unique(['book_id', 'user_id']);

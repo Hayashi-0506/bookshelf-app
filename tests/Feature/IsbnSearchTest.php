@@ -102,7 +102,9 @@ class IsbnSearchTest extends TestCase
             '*' => Http::response(['items' => [$this->volume('9780000000000')]]),
         ]);
 
-        $this->search()->assertNotFound();
+        $this->search()
+            ->assertNotFound()
+            ->assertExactJson(['error' => '書籍が見つかりませんでした。']);
     }
 
     /**
@@ -114,7 +116,7 @@ class IsbnSearchTest extends TestCase
 
         $this->search()
             ->assertNotFound()
-            ->assertExactJson(['error' => '該当する書籍が見つかりませんでした。']);
+            ->assertExactJson(['error' => '書籍が見つかりませんでした。']);
     }
 
     /**
@@ -141,27 +143,43 @@ class IsbnSearchTest extends TestCase
     }
 
     /**
-     * APIがエラーを返した場合は503とエラーメッセージを返す。
+     * APIのクォータを超過した場合は429とAPIキーの設定を促すメッセージを返し、再試行しない。
      */
-    public function test_returns_503_when_api_returns_error(): void
+    public function test_returns_429_when_quota_is_exceeded(): void
     {
-        Http::fake(['*' => Http::response(['error' => 'backendFailed'], 503)]);
+        Http::fake(['*' => Http::response(['error' => ['code' => 429, 'message' => 'Quota exceeded']], 429)]);
 
         $this->search()
-            ->assertStatus(503)
-            ->assertExactJson(['error' => '書籍情報の取得に失敗しました。時間をおいて再度お試しください。']);
+            ->assertStatus(429)
+            ->assertExactJson(['error' => 'Google Books API のクォータを超過しました。.env に GOOGLE_BOOKS_API_KEY を設定してください。']);
+
+        Http::assertSentCount(1);
     }
 
     /**
-     * APIに接続できない場合は503とエラーメッセージを返す。
+     * APIがクォータ超過以外のエラーを返した場合は500とエラーメッセージを返す。
      */
-    public function test_returns_503_when_connection_fails(): void
+    public function test_returns_500_when_api_returns_error(): void
+    {
+        collect([500, 503, 403])->each(function (int $status) {
+            Http::fake(['*' => Http::response(['error' => ['code' => $status]], $status)]);
+
+            $this->search()
+                ->assertStatus(500)
+                ->assertExactJson(['error' => 'API通信エラーが発生しました。']);
+        });
+    }
+
+    /**
+     * APIに接続できない場合は500とエラーメッセージを返す。
+     */
+    public function test_returns_500_when_connection_fails(): void
     {
         Http::fake(fn () => throw new ConnectionException('Connection timed out'));
 
         $this->search()
-            ->assertStatus(503)
-            ->assertJsonPath('error', '書籍情報の取得に失敗しました。時間をおいて再度お試しください。');
+            ->assertStatus(500)
+            ->assertExactJson(['error' => 'API通信エラーが発生しました。']);
     }
 
     /**
@@ -192,14 +210,17 @@ class IsbnSearchTest extends TestCase
     }
 
     /**
-     * 13桁の数字以外は検索できない。
+     * 13桁の数字以外は400とエラーメッセージを返し、外部APIにリクエストを送らない。
      */
-    public function test_rejects_non_13_digit_isbn(): void
+    public function test_returns_400_for_non_13_digit_isbn(): void
     {
         Http::fake();
 
-        $this->search('978487311565')->assertNotFound();
-        $this->search('abcdefghijklm')->assertNotFound();
+        collect(['978487311565', '97848731156580', '978-4873115658', 'abcdefghijklm'])->each(
+            fn (string $isbn) => $this->search($isbn)
+                ->assertStatus(400)
+                ->assertExactJson(['error' => 'ISBNは13桁で入力してください。'])
+        );
 
         Http::assertNothingSent();
     }

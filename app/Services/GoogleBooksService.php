@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -39,11 +41,13 @@ class GoogleBooksService
 
     /**
      * Google Books API にリクエストを送信します。
+     *
+     * 一時的なエラーは再試行しますが、クォータ超過（429）は再試行しても回復しないため、すぐに例外を投げます。
      */
     private function search(string $query): Response
     {
         return Http::timeout(5)
-            ->retry(2, 300, throw: false)
+            ->retry(2, 300, fn (Exception $e) => ! ($e instanceof RequestException && $e->response->status() === 429), throw: false)
             ->get(self::ENDPOINT, array_filter([
                 'q' => $query,
                 'key' => config('services.google_books.key'),

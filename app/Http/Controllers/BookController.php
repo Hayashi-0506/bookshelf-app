@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\IndexBookRequest;
+use App\Http\Requests\SearchBookByIsbnRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
@@ -133,16 +134,20 @@ class BookController extends Controller
     /**
      * ISBN で Google Books API から書籍情報を検索します。
      */
-    public function searchByIsbn(string $isbn, GoogleBooksService $googleBooks): JsonResponse
+    public function searchByIsbn(SearchBookByIsbnRequest $request, GoogleBooksService $googleBooks): JsonResponse
     {
         try {
-            $book = $googleBooks->findByIsbn($isbn);
-        } catch (RequestException|ConnectionException) {
-            return response()->json(['error' => '書籍情報の取得に失敗しました。時間をおいて再度お試しください。'], 503);
+            $book = $googleBooks->findByIsbn($request->validated('isbn'));
+        } catch (RequestException $e) {
+            return $e->response->status() === 429
+                ? response()->json(['error' => 'Google Books API のクォータを超過しました。.env に GOOGLE_BOOKS_API_KEY を設定してください。'], 429)
+                : response()->json(['error' => 'API通信エラーが発生しました。'], 500);
+        } catch (ConnectionException) {
+            return response()->json(['error' => 'API通信エラーが発生しました。'], 500);
         }
 
         if ($book === null) {
-            return response()->json(['error' => '該当する書籍が見つかりませんでした。'], 404);
+            return response()->json(['error' => '書籍が見つかりませんでした。'], 404);
         }
 
         return response()->json($book);
